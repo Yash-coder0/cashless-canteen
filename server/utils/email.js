@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const sendVerificationEmail = async (user, token, verifyUrl) => {
   
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   requireTLS: true, // true for 465, false for other ports
