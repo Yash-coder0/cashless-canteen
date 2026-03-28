@@ -11,7 +11,32 @@ const app = express();
 
 // ── Security ──────────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, Postman)
+      if (!origin) return callback(null, true)
+      
+      const allowedOrigins = [
+        process.env.CLIENT_URL,
+        'http://localhost:5173',
+      ]
+      
+      // Allow any Vercel preview URL for this project
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app')
+      ) {
+        return callback(null, true)
+      }
+      
+      return callback(new Error('Not allowed by CORS'))
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+)
 app.use(rateLimit({ windowMs: 15*60*1000, max: 200 }));
 app.use("/api/auth", rateLimit({ windowMs: 15*60*1000, max: 20,
   message: { success: false, message: "Too many requests. Try again in 15 minutes." } }));
