@@ -115,7 +115,7 @@ const register = async (req, res, next) => {
     try {
       await sendVerificationEmail(user, verificationToken, verifyUrl);
     } catch (err) {
-      console.error("Email send failed:", err);
+      throw new AppError(`Email Service Error: ${err.message}`, 500);
     }
 
     res.status(201).json({
