@@ -115,7 +115,8 @@ const register = async (req, res, next) => {
     try {
       await sendVerificationEmail(user, verificationToken, verifyUrl);
     } catch (err) {
-      throw new AppError(`Email Service Error: ${err.message}`, 500);
+      console.error("⚠️ Verification email failed to send:", err.message);
+      // Don't block registration — user is created, admin can manually verify if needed
     }
 
     res.status(201).json({
