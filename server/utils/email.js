@@ -1,22 +1,12 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require('resend');
 
 const sendVerificationEmail = async (user, token, verifyUrl) => {
-  
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  requireTLS: true, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // MUST BE APP PASSWORD
-  },
-});
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const mailOptions = {
-    from: process.env.EMAIL_FROM,
+  await resend.emails.send({
+    from: 'RIT Canteen <onboarding@resend.dev>',
     to: user.email,
-    subject: "Verify your RIT Canteen account",
+    subject: 'Verify your RIT Canteen account',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
         <h2 style="color: #f97316; text-align: center;">Welcome to RIT Canteen!</h2>
@@ -29,9 +19,7 @@ const transporter = nodemailer.createTransport({
         <p style="color: #666; font-size: 14px; margin-top: 30px;">Best regards,<br>The RIT Canteen Team</p>
       </div>
     `,
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 };
 
 module.exports = { sendVerificationEmail };
