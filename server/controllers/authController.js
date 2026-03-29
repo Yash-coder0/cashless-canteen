@@ -13,7 +13,6 @@ const crypto = require("crypto");
 const User = require("../models/User");
 const { Wallet } = require("../models/Wallet");
 const { AppError } = require("../middleware/errorHandler");
-const { sendVerificationEmail } = require("../utils/email");
 
 // ─────────────────────────────────────────────
 // HELPER — Generate JWT token
@@ -95,6 +94,7 @@ const register = async (req, res, next) => {
       collegeId: collegeId.trim().toUpperCase(),
       phone: phone?.trim() || undefined,
       role: "student", // ❗ ALWAYS hardcoded — never trust client input for role
+      isEmailVerified: true,
     });
 
     // ── Auto-create wallet for new student ───
@@ -104,24 +104,9 @@ const register = async (req, res, next) => {
       balance: 0,
     });
 
-    // ── Generate verification token ───────────
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-    user.emailVerificationToken = crypto.createHash("sha256").update(verificationToken).digest("hex");
-    user.emailVerificationExpiry = Date.now() + 24 * 60 * 60 * 1000;
-    await user.save({ validateBeforeSave: false });
-
-    // ── Send verification email ───────────────
-    const verifyUrl = `${process.env.CLIENT_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
-    try {
-      await sendVerificationEmail(user, verificationToken, verifyUrl);
-    } catch (err) {
-      console.error("⚠️ Verification email failed to send:", err.message);
-      // Don't block registration — user is created, admin can manually verify if needed
-    }
-
     res.status(201).json({
       success: true,
-      message: "Registration successful. Please check your email to verify your account.",
+      message: "Registration successful! You can now log in.",
     });
   } catch (error) {
     next(error);
@@ -154,9 +139,9 @@ const login = async (req, res, next) => {
     }
 
     // ── Check account email verification ─────
-    if (user.isEmailVerified === false) {
-      throw new AppError("Please verify your email before logging in. Check your inbox.", 403);
-    }
+    // if (user.isEmailVerified === false) {
+    //   throw new AppError("Please verify your email before logging in. Check your inbox.", 403);
+    // }
 
     // ── Check account status ──────────────────
     if (!user.isActive) {
