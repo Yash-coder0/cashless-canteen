@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       // ✅ Only allow college domain emails (change 'college.edu.in' to your domain)
       match: [
-        /^[a-zA-Z0-9._%+-]+@ritindia\.edu$/,
+        /^[a-zA-Z0-9._%+-]+@gmail\.com$/,
         "Only college email addresses are allowed",
       ],
     },

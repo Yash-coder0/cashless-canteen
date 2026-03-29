@@ -65,7 +65,7 @@ export default function Register() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">College Email</label>
-              <input className="input" type="email" placeholder="prn@ritindia.edu" required value={form.email} onChange={set('email')} />
+              <input className="input" type="email" placeholder="prn@gmail.com" required value={form.email} onChange={set('email')} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
