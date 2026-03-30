@@ -21,8 +21,8 @@ export default function Register() {
     setLoading(true)
     try {
       await register(form)
-      toast.success('Registration successful! Please log in.')
-      navigate('/login')
+      setSuccess(true)
+      toast.success('Please check your email to verify your account.')
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed.')
     } finally { setLoading(false) }
@@ -64,8 +64,8 @@ export default function Register() {
               <input className="input" placeholder="Arjun Sharma" required value={form.name} onChange={set('name')} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">College Email</label>
-              <input className="input" type="email" placeholder="prn@gmail.com" required value={form.email} onChange={set('email')} />
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <input className="input" type="email" placeholder="you@gmail.com" required value={form.email} onChange={set('email')} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

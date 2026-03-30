@@ -86,27 +86,24 @@ const register = async (req, res, next) => {
       );
     }
 
-    // ── Create user (password hashed by schema pre-save hook) ─
-    const user = await User.create({
+    // ── Encode attributes in a temporary JWT ──
+    const tempPayload = {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password,
       collegeId: collegeId.trim().toUpperCase(),
-      phone: phone?.trim() || undefined,
-      role: "student", // ❗ ALWAYS hardcoded — never trust client input for role
-      isEmailVerified: true,
-    });
+      phone: phone?.trim() || undefined
+    };
 
-    // ── Auto-create wallet for new student ───
-    // Every student gets a wallet on signup — balance starts at 0
-    await Wallet.create({
-      userId: user._id,
-      balance: 0,
-    });
+    const verificationToken = jwt.sign(tempPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).json({
+    // ── Send verification email ───────────────
+    const { sendVerificationEmail } = require("../utils/emailSender");
+    await sendVerificationEmail(tempPayload.email, tempPayload.name, verificationToken);
+
+    res.status(200).json({
       success: true,
-      message: "Registration successful! You can now log in.",
+      message: "Registration successful! Please verify your email before logging in. Check your inbox.",
     });
   } catch (error) {
     next(error);
@@ -338,21 +335,37 @@ const verifyEmail = async (req, res, next) => {
     const { token } = req.query;
     if (!token) throw new AppError("Verification token is missing.", 400);
 
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-    const user = await User.findOne({
-      emailVerificationToken: hashedToken,
-      emailVerificationExpiry: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      throw new AppError("Token is invalid or has expired. Please register again if your account was not activated.", 400);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      throw new AppError("Token is invalid or has expired. Please register again to get a new verification link.", 400);
     }
 
-    user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpiry = undefined;
-    await user.save({ validateBeforeSave: false });
+    // Check if user is already verified and inserted
+    const existingUser = await User.findOne({ email: decoded.email });
+    if (existingUser) {
+      return res.status(200).json({
+        success: true,
+        message: "Email is already verified. You can log in.",
+      });
+    }
+
+    // Create user securely (password will be hashed in model pre-save hook)
+    const user = await User.create({
+      name: decoded.name,
+      email: decoded.email,
+      password: decoded.password,
+      collegeId: decoded.collegeId,
+      phone: decoded.phone,
+      role: "student",
+      isEmailVerified: true,
+    });
+
+    await Wallet.create({
+      userId: user._id,
+      balance: 0,
+    });
 
     res.status(200).json({
       success: true,

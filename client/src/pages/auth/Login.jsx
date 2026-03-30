@@ -90,8 +90,8 @@ export default function Login() {
           <h2 className="font-display font-600 text-xl text-gray-900 mb-6 text-center mt-4 border-b border-gray-100 pb-4">Sign in</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">College Email</label>
-              <input className="input" type="email" placeholder="prn@gmail.com" required
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <input className="input" type="email" placeholder="you@gmail.com" required
                 value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
             </div>
             <div>
