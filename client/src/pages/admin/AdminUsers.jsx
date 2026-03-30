@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react'
 import { adminAPI } from '../../api/axios'
 import toast from 'react-hot-toast'
-import { Search, UserCheck, UserX } from 'lucide-react'
+import { Search, UserCheck, UserX, X } from 'lucide-react'
 import { format } from 'date-fns'
-import { X } from 'lucide-react';
+import ResponsiveTable from '../../components/ResponsiveTable'
 
 export default function AdminUsers() {
   const [users, setUsers]     = useState([])
@@ -47,61 +47,86 @@ export default function AdminUsers() {
           value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Name','Email','College ID','Phone','Joined','Status','Action'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? [...Array(8)].map((_, i) => (
-                <tr key={i}><td colSpan={7} className="px-4 py-3"><div className="skeleton h-4 w-full" /></td></tr>
-              )) : users.map(user => (
-                <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-500 font-bold text-xs shrink-0">
-                        {user.name?.slice(0,2).toUpperCase()}
-                      </div>
-                      <span className="font-medium text-gray-900">{user.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{user.email}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-gray-600">{user.collegeId}</td>
-                  <td className="px-4 py-3 text-gray-500">{user.phone || '—'}</td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{format(new Date(user.createdAt), 'dd MMM yy')}</td>
-                  <td className="px-4 py-3">
-                    <span className={`badge ${user.isActive ? 'badge-green' : 'badge-red'}`}>
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => handleToggle(user)}
-                      className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg transition-all
-                                  ${user.isActive ? 'text-red-500 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'}`}>
-                      {user.isActive ? <><UserX size={13} />Deactivate</> : <><UserCheck size={13} />Activate</>}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading ? (
+        <div className="card p-4 space-y-4">
+          {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-16 w-full" />)}
         </div>
-        {total > 20 && (
-          <div className="flex justify-between items-center px-4 py-3 border-t border-gray-100">
-            <p className="text-xs text-gray-400">{total} students</p>
-            <div className="flex gap-2">
-              <button disabled={page===1} onClick={() => fetch(page-1)} className="btn-outline px-3 py-1 text-xs disabled:opacity-40">Prev</button>
-              <span className="text-xs text-gray-500 flex items-center">Page {page}</span>
-              <button disabled={users.length<20} onClick={() => fetch(page+1)} className="btn-outline px-3 py-1 text-xs disabled:opacity-40">Next</button>
+      ) : (
+        <div className="card overflow-hidden">
+          <ResponsiveTable 
+            columns={[
+              { header: 'Name', cell: user => (
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-500 font-bold text-xs shrink-0">
+                      {user.name?.slice(0,2).toUpperCase()}
+                    </div>
+                    <span className="font-medium text-gray-900">{user.name}</span>
+                  </div>
+                )
+              },
+              { header: 'Email', cell: user => <span className="text-gray-500">{user.email}</span> },
+              { header: 'College ID', cell: user => <span className="font-mono text-xs text-gray-600">{user.collegeId}</span> },
+              { header: 'Phone', cell: user => <span className="text-gray-500">{user.phone || '—'}</span> },
+              { header: 'Joined', cell: user => <span className="text-gray-400 text-xs">{format(new Date(user.createdAt), 'dd MMM yy')}</span> },
+              { header: 'Status', cell: user => (
+                  <span className={`badge ${user.isActive ? 'badge-green' : 'badge-red'}`}>
+                    {user.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                )
+              },
+              { header: 'Action', cell: user => (
+                  <button onClick={() => handleToggle(user)}
+                    className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 min-h-[36px] rounded-lg transition-all
+                                ${user.isActive ? 'text-red-500 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'}`}>
+                    {user.isActive ? <><UserX size={13} />Deactivate</> : <><UserCheck size={13} />Activate</>}
+                  </button>
+                )
+              }
+            ]}
+            data={users}
+            renderMobileCard={(user) => (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand-500 font-bold text-sm shrink-0">
+                      {user.name?.slice(0,2).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{user.name}</p>
+                      <p className="font-mono text-xs text-gray-500">{user.collegeId}</p>
+                    </div>
+                  </div>
+                  <span className={`badge ${user.isActive ? 'badge-green' : 'badge-red'}`}>
+                    {user.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p>{user.email}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{user.phone || 'No phone'}</p>
+                </div>
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-1">
+                  <span className="text-xs text-gray-400">Joined {format(new Date(user.createdAt), 'dd MMM yyyy')}</span>
+                  <button onClick={() => handleToggle(user)}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 min-h-[44px] rounded-lg transition-all border
+                                ${user.isActive ? 'text-red-600 border-red-100 hover:bg-red-50' : 'text-emerald-600 border-emerald-100 hover:bg-emerald-50'}`}>
+                    {user.isActive ? <><UserX size={14} /> Deactivate</> : <><UserCheck size={14} /> Activate</>}
+                  </button>
+                </div>
+              </div>
+            )}
+          />
+          {total > 20 && (
+            <div className="flex justify-between items-center px-4 py-3 border-t border-gray-100 bg-white md:bg-gray-50/50">
+              <p className="text-xs text-gray-400">{total} students</p>
+              <div className="flex gap-2">
+                <button disabled={page===1} onClick={() => fetch(page-1)} className="btn-outline px-3 py-1 min-h-[36px] text-xs disabled:opacity-40">Prev</button>
+                <span className="text-xs text-gray-500 flex items-center">Page {page}</span>
+                <button disabled={users.length<20} onClick={() => fetch(page+1)} className="btn-outline px-3 py-1 min-h-[36px] text-xs disabled:opacity-40">Next</button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -159,7 +184,7 @@ export function AdminStaff() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? [...Array(4)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />) :
           staff.map(s => (
             <div key={s._id} className="card p-5 flex items-start justify-between">

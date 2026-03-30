@@ -148,15 +148,19 @@ export default function AdminMenu() {
   )
 
   return (
-    <div className="p-6 animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+    <div className="px-4 md:px-6 py-6 animate-fade-in overflow-x-hidden max-w-full">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="font-display font-700 text-2xl text-gray-900">Menu Management</h1>
           <p className="text-sm text-gray-400">{items.length} items total</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setModal('addCat')} className="btn-outline text-sm">+ Category</button>
-          <button onClick={openAdd} className="btn-primary text-sm flex items-center gap-1.5"><Plus size={16} /> Add Item</button>
+        <div className="flex gap-2 w-full md:w-auto">
+          <button onClick={() => setModal('addCat')} className="btn-outline text-sm flex-1 md:flex-none min-h-[44px] flex items-center justify-center">
+            + Category
+          </button>
+          <button onClick={openAdd} className="btn-primary text-sm flex items-center justify-center gap-1.5 flex-1 md:flex-none min-h-[44px]">
+            <Plus size={16} /> Add Item
+          </button>
         </div>
       </div>
 
@@ -167,8 +171,8 @@ export default function AdminMenu() {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
+      {/* Desktop Table View */}
+      <div className="hidden md:block card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
@@ -213,13 +217,13 @@ export default function AdminMenu() {
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
                       <button onClick={() => handleToggleSoldOut(item)} title={item.isSoldOut ? 'Mark available' : 'Mark sold out'}
-                        className="btn-ghost p-1.5 text-gray-400">
+                        className="btn-ghost p-2 min-w-[40px] min-h-[40px] flex items-center justify-center text-gray-400">
                         {item.isSoldOut ? <ToggleLeft size={18} /> : <ToggleRight size={18} className="text-emerald-500" />}
                       </button>
-                      <button onClick={() => openEdit(item)} className="btn-ghost p-1.5 text-gray-400 hover:text-brand-500">
+                      <button onClick={() => openEdit(item)} className="btn-ghost p-2 min-w-[40px] min-h-[40px] flex items-center justify-center text-gray-400 hover:text-brand-500">
                         <Pencil size={15} />
                       </button>
-                      <button onClick={() => handleDelete(item._id)} className="btn-ghost p-1.5 text-gray-400 hover:text-red-500">
+                      <button onClick={() => handleDelete(item._id)} className="btn-ghost p-2 min-w-[40px] min-h-[40px] flex items-center justify-center text-gray-400 hover:text-red-500">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -229,6 +233,56 @@ export default function AdminMenu() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Grid View */}
+      <div className="block md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {loading ? [...Array(6)].map((_, i) => (
+          <div key={i} className="card p-4 skeleton h-32 w-full" />
+        )) : items.map(item => (
+          <div key={item._id} className={`card p-4 flex flex-col gap-3 ${!item.isAvailable ? 'opacity-50' : ''}`}>
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                {item.images?.[0] ? <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover" />
+                  : <div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-gray-900 mb-0.5">{item.name}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-bold text-gray-900">₹{item.price}</span>
+                  <span className="text-xs text-gray-500 px-1.5 py-0.5 bg-gray-100 rounded-md truncate">{item.category?.name}</span>
+                </div>
+                <div className="flex gap-1.5 flex-wrap">
+                  {item.isSoldOut ? <span className="badge badge-red text-[10px] px-1.5">Sold Out</span> : item.isAvailable ? <span className="badge badge-green text-[10px] px-1.5">Available</span> : <span className="badge badge-gray text-[10px] px-1.5">Hidden</span>}
+                  {item.isVegetarian && <span title="Veg"><Leaf size={12} className="text-emerald-500" /></span>}
+                  {item.isSpicy && <span title="Spicy"><Flame size={12} className="text-red-400" /></span>}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 mt-2">
+              <button 
+                onClick={() => handleToggleSoldOut(item)} 
+                className="btn-outline text-xs px-3 py-2 flex items-center gap-1.5 flex-1 min-h-[44px] justify-center"
+              >
+                {item.isSoldOut ? <ToggleLeft size={16} /> : <ToggleRight size={16} className="text-emerald-500" />}
+                {item.isSoldOut ? 'Restock' : 'Sold Out'}
+              </button>
+              <button 
+                onClick={() => openEdit(item)} 
+                className="btn-ghost flex items-center justify-center p-2 min-w-[44px] min-h-[44px] bg-gray-50 text-gray-600 hover:text-brand-500"
+              >
+                <Pencil size={16} />
+              </button>
+              <button 
+                onClick={() => handleDelete(item._id)} 
+                className="btn-ghost flex items-center justify-center p-2 min-w-[44px] min-h-[44px] bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Add/Edit modal */}

@@ -27,7 +27,7 @@ export default function StudentLayout() {
       </header>
 
       {/* Page content */}
-      <main className="flex-1 pb-20">
+      <main className="flex-1 pb-24 w-full max-w-screen-xl mx-auto">
         <Outlet />
       </main>
 

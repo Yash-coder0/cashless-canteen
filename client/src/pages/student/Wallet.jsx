@@ -123,20 +123,20 @@ export default function Wallet() {
       {/* Top-up */}
       <div className="card p-5">
         <h3 className="font-semibold text-gray-900 mb-3">Add Money</h3>
-        <div className="flex gap-2 mb-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
           {[50,100,200,500].map(amt => (
             <button key={amt} onClick={() => setTopUpAmount(String(amt))}
-              className={`flex-1 py-2 text-sm font-medium rounded-xl border transition-all
+              className={`flex-1 py-2 min-h-[44px] flex items-center justify-center text-sm font-medium rounded-xl border transition-all
                           ${topUpAmount === String(amt) ? 'bg-brand-50 border-brand-400 text-brand-600' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
               ₹{amt}
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
-          <input className="input flex-1" type="number" placeholder="Custom amount (₹10 – ₹5000)"
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input className="input flex-1 h-11" type="number" placeholder="Custom amount (₹10 – ₹5000)"
             value={topUpAmount} onChange={e => setTopUpAmount(e.target.value)} min={10} max={5000} />
           <button onClick={handleTopUp} disabled={topping || !topUpAmount}
-            className="btn-primary flex items-center gap-1.5 shrink-0">
+            className="btn-primary flex items-center justify-center gap-1.5 shrink-0 min-h-[44px] px-6">
             <Plus size={16} /> Add
           </button>
         </div>
@@ -145,19 +145,19 @@ export default function Wallet() {
       {/* Spending chart */}
       {analytics.length > 0 && (
         <div className="card p-5">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
             <h3 className="font-semibold text-gray-900">Spending</h3>
-            <div className="flex gap-1">
+            <div className="flex overflow-x-auto scrollbar-hide gap-1 w-full sm:w-auto pb-1 sm:pb-0">
               {['weekly','monthly','yearly'].map(p => (
                 <button key={p} onClick={() => setPeriod(p)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-all
+                  className={`shrink-0 px-3 py-2 min-h-[44px] text-sm whitespace-nowrap flex items-center justify-center rounded-lg font-medium transition-all
                               ${period === p ? 'bg-brand-50 text-brand-600' : 'text-gray-400 hover:text-gray-600'}`}>
                   {p.charAt(0).toUpperCase() + p.slice(1)}
                 </button>
               ))}
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={120}>
+          <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={analytics} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="spend" x1="0" y1="0" x2="0" y2="1">

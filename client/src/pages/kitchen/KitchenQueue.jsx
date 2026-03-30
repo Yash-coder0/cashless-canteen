@@ -93,15 +93,15 @@ function OrderCard({ order, onUpdate, onReject }) {
           {/* Reject — only before cooking */}
           {['placed','accepted'].includes(order.status) && (
             <button onClick={handleReject} disabled={loading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 text-red-500
+              className="flex items-center justify-center gap-1.5 px-3 min-h-[44px] rounded-xl border border-red-200 text-red-500
                          hover:bg-red-50 text-xs font-medium transition-all disabled:opacity-50">
               <XCircle size={13} /> Reject
             </button>
           )}
           {nextStatus && (
             <button onClick={handleNext} disabled={loading}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600
-                         text-white text-xs font-semibold transition-all active:scale-95 disabled:opacity-50">
+              className="flex items-center justify-center gap-1.5 px-4 min-h-[44px] rounded-xl bg-brand-500 hover:bg-brand-600
+                         text-white text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 flex-1">
               {loading ? '…' : NEXT_LABELS[order.status]}
             </button>
           )}
@@ -235,7 +235,7 @@ export default function KitchenQueue() {
           </h3>
           <button 
             onClick={() => setScanning(!scanning)}
-            className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${scanning ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'}`}
+            className={`px-4 min-h-[44px] rounded-xl text-sm font-semibold transition-colors ${scanning ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'}`}
           >
             {scanning ? 'Stop Scanner' : 'Start Scanner'}
           </button>
@@ -288,10 +288,10 @@ export default function KitchenQueue() {
             </div>
           </div>
         </div>
-        <div className="flex bg-gray-50 p-1 rounded-xl w-full md:w-auto">
+        <div className="flex flex-wrap sm:flex-nowrap bg-gray-50 p-1 rounded-xl w-full md:w-auto">
           {['daily', 'weekly', 'monthly', 'yearly'].map(p => (
             <button key={p} onClick={() => setAnalyticsPeriod(p)}
-              className={`flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${analyticsPeriod === p ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex-1 sm:flex-none px-4 py-2 min-h-[40px] rounded-lg text-xs font-semibold capitalize transition-all ${analyticsPeriod === p ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
               {p}
             </button>
           ))}
@@ -299,7 +299,7 @@ export default function KitchenQueue() {
       </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {Object.entries(columns).map(([status, items]) => {
           const { label, color, icon: Icon } = colHeaders[status]
           return (
@@ -315,7 +315,7 @@ export default function KitchenQueue() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="space-y-3">
               {[...Array(2)].map((_, j) => <div key={j} className="skeleton h-40 rounded-2xl" />)}
@@ -330,7 +330,7 @@ export default function KitchenQueue() {
         </div>
       ) : (
         /* Kanban columns */
-        <div className="grid grid-cols-4 gap-4 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
           {Object.entries(columns).map(([status, items]) => {
             const { label, color } = colHeaders[status]
             return (

@@ -82,33 +82,42 @@ export default function OrderDetail() {
         </span>
       </div>
 
-      {/* Status tracker */}
+      {/* Status tracker (Vertical Timeline) */}
       {!isRejected && (
         <div className="card p-5 mb-4">
-          <div className="flex items-center justify-between relative">
-            <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-gray-100" />
-            <div className="absolute top-5 left-[10%] h-0.5 bg-brand-400 transition-all duration-700"
-              style={{ width: `${Math.max(0, currentStep / (STEPS.length-1)) * 80}%` }} />
-            {STEPS.filter(s => s !== 'completed' || order.status === 'completed').slice(0,5).map((step, i) => {
-              const done = currentStep >= i
-              return (
-                <div key={step} className="flex flex-col items-center gap-1.5 z-10">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all duration-300
-                                   ${done ? 'bg-brand-500 border-brand-500' : 'bg-white border-gray-200'}`}>
-                    {done ? STEP_ICONS[step] : <span className="w-2 h-2 rounded-full bg-gray-200" />}
+          <h3 className="font-semibold text-gray-900 mb-4 px-1">Order Status</h3>
+          <div className="relative pl-2">
+            {/* Vertical Line Background */}
+            <div className="absolute top-5 bottom-5 left-[23px] w-0.5 bg-gray-100" />
+            
+            {/* Vertical Line Progress */}
+            <div className="absolute top-5 left-[23px] w-0.5 bg-brand-400 transition-all duration-700"
+              style={{ height: `${STEPS.filter(s => s !== 'completed' || order.status === 'completed').length > 1 ? Math.min(100, Math.max(0, currentStep / (STEPS.filter(s => s !== 'completed' || order.status === 'completed').length - 1)) * 100) : 0}%` }} />
+            
+            <div className="space-y-6">
+              {STEPS.filter(s => s !== 'completed' || order.status === 'completed').slice(0,5).map((step, i) => {
+                const done = currentStep >= i
+                return (
+                  <div key={step} className="flex items-center gap-4 relative z-10">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all duration-300 shrink-0
+                                     ${done ? 'bg-brand-500 border-brand-500' : 'bg-white border-gray-200'}`}>
+                      {done ? STEP_ICONS[step] : <span className="w-2.5 h-2.5 rounded-full bg-gray-200" />}
+                    </div>
+                    <div>
+                      <span className={`text-sm font-semibold block ${done ? 'text-gray-900' : 'text-gray-400'}`}>
+                        {STEP_LABELS[step]}
+                      </span>
+                      {step === order.status && order.estimatedTime && step !== 'completed' && step !== 'ready' && (
+                        <span className="text-xs text-brand-600 font-medium flex items-center gap-1 mt-0.5">
+                          <Clock size={12} /> Est. {order.estimatedTime} min
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <span className={`text-[10px] font-medium ${done ? 'text-brand-600' : 'text-gray-400'}`}>
-                    {STEP_LABELS[step]}
-                  </span>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-          {order.estimatedTime && order.status !== 'completed' && (
-            <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
-              <Clock size={12} /> Est. {order.estimatedTime} min
-            </p>
-          )}
         </div>
       )}
 
