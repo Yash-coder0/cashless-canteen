@@ -9,6 +9,7 @@
 
 const { MenuItem, Category } = require("../models/MenuItem");
 const { AppError } = require("../middleware/errorHandler");
+const { uploadToCloudinary } = require("../utils/cloudinary");
 
 // ─────────────────────────────────────────────
 // @route   GET /api/menu
@@ -164,8 +165,9 @@ const createItem = async (req, res, next) => {
     }
     
     let finalImages = images || [];
-    if (req.file && req.file.path) {
-      finalImages = [req.file.path];
+    if (req.file && req.file.buffer) {
+      const uploadUrl = await uploadToCloudinary(req.file.buffer, "canteen_menu");
+      finalImages = [uploadUrl];
     }
 
     // Verify category exists and is active
@@ -221,8 +223,8 @@ const updateItem = async (req, res, next) => {
       updates.tags = updates.tags ? updates.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
     }
 
-    if (req.file && req.file.path) {
-      updates.images = [req.file.path];
+    if (req.file && req.file.buffer) {
+      updates.images = [await uploadToCloudinary(req.file.buffer, "canteen_menu")];
     }
 
     // If price is being updated, convert rupees → paise
