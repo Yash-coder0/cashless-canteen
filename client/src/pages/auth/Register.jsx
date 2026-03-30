@@ -67,13 +67,17 @@ export default function Register() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
               <input className="input" type="email" placeholder="you@gmail.com" required value={form.email} onChange={set('email')} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">College ID</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
+                  College ID
+                </label>
                 <input className="input" placeholder="CS21B001" required value={form.collegeId} onChange={set('collegeId')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone (opt.)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
+                  Phone (opt.)
+                </label>
                 <input className="input" placeholder="98xxxxxxxx" value={form.phone} onChange={set('phone')} />
               </div>
             </div>

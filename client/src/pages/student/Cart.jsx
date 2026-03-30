@@ -79,39 +79,44 @@ export default function Cart() {
       {/* Cart items */}
       <div className="space-y-3 mb-4">
         {items.map(item => (
-          <div key={item.menuItem?._id || item.menuItem} className="card p-3 flex items-center gap-3">
-            <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-              {item.menuItem?.images?.[0]
-                ? <img src={item.menuItem.images[0]} alt={item.name} className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>
-              }
+          <div key={item.menuItem?._id || item.menuItem} className="card p-3">
+            <div className="flex items-start gap-3">
+              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                {item.menuItem?.images?.[0]
+                  ? <img src={item.menuItem.images[0]} alt={item.name} className="w-full h-full object-cover" />
+                  : <div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>
+                }
+              </div>
+              <div className="flex-1 min-w-0 pt-1">
+                <div className="flex justify-between items-start">
+                  <p className="font-semibold text-sm text-gray-900 line-clamp-2">{item.name}</p>
+                  <button onClick={() => removeItem(item.menuItem?._id || item.menuItem)}
+                    className="p-1.5 text-gray-300 hover:text-red-400 transition-colors shrink-0 min-w-[36px] min-h-[36px] flex items-center justify-center -mt-1.5 -mr-1.5 rounded-lg active:bg-red-50">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5">₹{item.price} each</p>
+                {item.menuItem?.isSoldOut && (
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-red-500 mt-1 bg-red-50 w-fit px-1.5 py-0.5 rounded">
+                    <AlertCircle size={10} /> SOLD OUT
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-gray-900 truncate">{item.name}</p>
-              <p className="text-xs text-gray-500">₹{item.price} each</p>
-              {item.menuItem?.isSoldOut && (
-                <span className="flex items-center gap-1 text-xs text-red-500 mt-0.5">
-                  <AlertCircle size={10} /> Now sold out
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button onClick={() => updateItem(item.menuItem?._id || item.menuItem, item.quantity - 1)}
-                className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all">
-                <Minus size={12} className="text-gray-600" />
-              </button>
-              <span className="text-sm font-bold w-5 text-center">{item.quantity}</span>
-              <button onClick={() => updateItem(item.menuItem?._id || item.menuItem, item.quantity + 1)}
-                className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all">
-                <Plus size={12} className="text-gray-600" />
-              </button>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="font-bold text-sm text-gray-900">₹{(item.price * item.quantity).toFixed(2)}</p>
-              <button onClick={() => removeItem(item.menuItem?._id || item.menuItem)}
-                className="text-gray-300 hover:text-red-400 transition-colors mt-0.5">
-                <Trash2 size={13} />
-              </button>
+            
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+              <div className="flex items-center gap-2">
+                <button onClick={() => updateItem(item.menuItem?._id || item.menuItem, item.quantity - 1)}
+                  className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
+                  <Minus size={14} className="text-gray-600" />
+                </button>
+                <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
+                <button onClick={() => updateItem(item.menuItem?._id || item.menuItem, item.quantity + 1)}
+                  className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
+                  <Plus size={14} className="text-gray-600" />
+                </button>
+              </div>
+              <p className="font-bold text-base text-gray-900">₹{(item.price * item.quantity).toFixed(2)}</p>
             </div>
           </div>
         ))}
@@ -153,13 +158,20 @@ export default function Cart() {
         </span>
       </div>
 
-      {/* Place order button */}
-      <button onClick={handlePlaceOrder} disabled={placing}
-        className="btn-primary w-full flex items-center justify-center gap-2 text-base py-3.5 mb-6">
-        {placing ? 'Placing order…' : (
-          <><span>Place Order · ₹{total.toFixed(2)}</span><ArrowRight size={18} /></>
-        )}
-      </button>
+      {/* Spacer for floating button */}
+      <div className="h-28 sm:h-0"></div>
+
+      {/* Place order floating bar on mobile */}
+      <div className="fixed sm:static bottom-16 sm:bottom-auto left-0 right-0 p-4 sm:p-0 bg-white/95 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border-t border-gray-100 sm:border-0 z-40 pb-6 sm:pb-0">
+        <div className="max-w-lg mx-auto">
+          <button onClick={handlePlaceOrder} disabled={placing}
+            className="btn-primary w-full flex items-center justify-center gap-2 text-base py-3.5 min-h-[56px] shadow-lg sm:shadow-sm">
+            {placing ? 'Placing order…' : (
+              <><span>Place Order · ₹{total.toFixed(2)}</span><ArrowRight size={18} /></>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

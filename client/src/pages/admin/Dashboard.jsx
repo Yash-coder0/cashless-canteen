@@ -72,25 +72,25 @@ export default function Dashboard() {
   return (
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1 className="font-display font-700 text-2xl text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-400 mt-0.5">Canteen overview and analytics</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button onClick={() => handleExport('revenue')}
-            className="btn-outline text-sm flex items-center gap-1.5">
+            className="flex-1 sm:flex-none min-h-[44px] px-4 btn-outline text-sm flex items-center justify-center gap-1.5">
             <Download size={14} /> Revenue CSV
           </button>
           <button onClick={() => handleExport('orders')}
-            className="btn-outline text-sm flex items-center gap-1.5">
+            className="flex-1 sm:flex-none min-h-[44px] px-4 btn-outline text-sm flex items-center justify-center gap-1.5">
             <Download size={14} /> Orders CSV
           </button>
         </div>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={IndianRupee} label="Total Revenue"     color="brand"
           value={`₹${overview?.totalRevenue?.toFixed(0) || 0}`}
           sub="All time completed orders" />
@@ -107,17 +107,17 @@ export default function Dashboard() {
       <div className="card p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display font-600 text-lg text-gray-900">Revenue</h2>
-          <div className="flex gap-1 bg-gray-50 p-1 rounded-xl">
+          <div className="flex overflow-x-auto scrollbar-hide gap-1 bg-gray-50 p-1 rounded-xl max-w-full">
             {['daily','weekly','monthly','yearly'].map(p => (
               <button key={p} onClick={() => setPeriod(p)}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all
+                className={`shrink-0 px-3 py-2 min-h-[44px] text-xs font-medium transition-all whitespace-nowrap rounded-lg
                             ${period === p ? 'bg-white text-brand-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
                 {p.charAt(0).toUpperCase() + p.slice(1)}
               </button>
             ))}
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={revenue} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
             <defs>
               <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
@@ -137,44 +137,44 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Top items */}
-        <div className="card p-5">
+        <div className="card p-5 min-w-0 h-full">
           <h2 className="font-display font-600 text-base text-gray-900 mb-4 flex items-center gap-2">
             <Star size={16} className="text-amber-400" /> Most Popular Items
           </h2>
           <div className="space-y-3">
             {items?.mostPopular?.map((item, i) => (
-              <div key={item._id} className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400">
+              <div key={item._id} className="flex items-center gap-2 flex-wrap">
+                <span className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400 shrink-0">
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
                   <p className="text-xs text-gray-400">{item.totalOrders} orders</p>
                 </div>
-                <span className="text-sm font-bold text-emerald-600">₹{item.totalRevenue?.toFixed(0)}</span>
+                <span className="text-sm font-bold text-emerald-600 ml-auto shrink-0">₹{item.totalRevenue?.toFixed(0)}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Slow movers */}
-        <div className="card p-5">
+        <div className="card p-5 min-w-0 h-full">
           <h2 className="font-display font-600 text-base text-gray-900 mb-4 flex items-center gap-2">
             <TrendingUp size={16} className="text-gray-300" /> Slow Moving Items
           </h2>
           <div className="space-y-3">
             {items?.slowMoving?.map((item, i) => (
-              <div key={item._id} className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-xs font-bold text-red-300">
+              <div key={item._id} className="flex items-center gap-2 flex-wrap">
+                <span className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-xs font-bold text-red-300 shrink-0">
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
                   <p className="text-xs text-gray-400">{item.totalOrders} orders</p>
                 </div>
-                <span className="text-sm font-bold text-gray-400">₹{item.totalRevenue?.toFixed(0)}</span>
+                <span className="text-sm font-bold text-gray-400 ml-auto shrink-0">₹{item.totalRevenue?.toFixed(0)}</span>
               </div>
             ))}
           </div>
@@ -182,11 +182,11 @@ export default function Dashboard() {
 
         {/* Peak hours */}
         {overview?.peakHours?.length > 0 && (
-          <div className="card p-5 col-span-2">
+          <div className="card p-5 md:col-span-2">
             <h2 className="font-display font-600 text-base text-gray-900 mb-4">Peak Hours</h2>
-            <div className="flex gap-4">
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
               {overview.peakHours.map(h => (
-                <div key={h.hour} className="flex-1 bg-brand-50 rounded-2xl p-4 text-center">
+                <div key={h.hour} className="flex-1 min-w-[120px] shrink-0 bg-brand-50 rounded-2xl p-4 text-center">
                   <p className="font-display font-700 text-2xl text-brand-500">{h.hour}</p>
                   <p className="text-sm text-gray-500 mt-1">{h.orders} orders</p>
                 </div>

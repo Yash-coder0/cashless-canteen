@@ -60,9 +60,9 @@ export default function KitchenProfile() {
 
       {/* Account info */}
       <div className="card p-4 border border-gray-100 shadow-sm">
-        <div className="flex items-center justify-between mb-2 px-1">
-          <h3 className="font-semibold text-gray-900">Staff Details</h3>
-          <button onClick={() => setShowEdit(v => !v)} className="text-brand-500 text-xs font-semibold hover:text-brand-600 transition-colors">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold text-gray-900 px-1">Staff Details</h3>
+          <button onClick={() => setShowEdit(v => !v)} className="text-brand-500 text-xs font-semibold hover:text-brand-600 transition-colors px-2 py-2 min-h-[44px] flex items-center justify-center">
             {showEdit ? 'Cancel Edit' : 'Edit Profile'}
           </button>
         </div>
@@ -92,7 +92,7 @@ export default function KitchenProfile() {
                 value={pwForm.newPassword}
                 onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))} />
             </div>
-            <button type="submit" disabled={saving} className="btn-primary w-full mt-2">
+            <button type="submit" disabled={saving} className="btn-primary w-full mt-2 min-h-[44px]">
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
           </form>

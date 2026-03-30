@@ -82,20 +82,20 @@ function MenuCard({ item }) {
             <span className="text-xs text-gray-400 font-medium">Unavailable</span>
           ) : qty === 0 ? (
             <button onClick={handleAdd} disabled={adding}
-              className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-1.5 rounded-xl
+              className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 min-h-[44px] rounded-xl
                          flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-70">
-              <Plus size={14} /> Add
+              <Plus size={16} /> Add
             </button>
           ) : (
-            <div className="flex items-center gap-2 bg-brand-50 rounded-xl px-1.5 py-1">
+            <div className="flex items-center gap-1.5 bg-brand-50 rounded-xl p-1">
               <button onClick={() => handleQty(qty - 1)}
-                className="w-6 h-6 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
-                <Minus size={12} className="text-brand-500" />
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
+                <Minus size={14} className="text-brand-500" />
               </button>
-              <span className="text-sm font-bold text-brand-600 min-w-[16px] text-center">{qty}</span>
+              <span className="text-sm font-bold text-brand-600 min-w-[24px] text-center">{qty}</span>
               <button onClick={() => handleQty(qty + 1)}
-                className="w-6 h-6 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
-                <Plus size={12} className="text-brand-500" />
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
+                <Plus size={14} className="text-brand-500" />
               </button>
             </div>
           )}
@@ -175,13 +175,13 @@ export default function Menu() {
       {/* Category chips */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide">
         <button onClick={() => setCategory('')}
-          className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all
+          className={`shrink-0 px-4 min-h-[40px] rounded-full text-sm font-medium border transition-all flex items-center justify-center
                       ${!activeCategory ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
           All
         </button>
         {categories.map(c => (
           <button key={c._id} onClick={() => setCategory(c._id)}
-            className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all
+            className={`shrink-0 px-4 min-h-[40px] rounded-full text-sm font-medium border transition-all flex items-center justify-center
                         ${activeCategory === c._id ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
             {c.name}
           </button>
@@ -189,14 +189,14 @@ export default function Menu() {
       </div>
 
       {/* Filters row */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <button onClick={() => setIsVeg(v => !v)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-sm font-medium transition-all
+          className={`flex items-center justify-center gap-1.5 px-4 min-h-[44px] rounded-xl border text-sm font-medium transition-all flex-1 sm:flex-none
                       ${isVeg ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}>
-          <Leaf size={13} /> Veg only
+          <Leaf size={16} /> Veg
         </button>
         <select value={sort} onChange={e => setSort(e.target.value)}
-          className="text-sm border border-gray-200 rounded-xl px-3 py-1.5 bg-white text-gray-600 outline-none focus:border-brand-400">
+          className="text-sm border border-gray-200 rounded-xl px-4 min-h-[44px] bg-white text-gray-600 outline-none focus:border-brand-400 flex-1 sm:flex-none">
           {SORTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
       </div>
