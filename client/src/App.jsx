@@ -19,6 +19,8 @@ import Menu    from './pages/student/Menu'
 import Cart    from './pages/student/Cart'
 import Orders  from './pages/student/Orders'
 import OrderDetail from './pages/student/OrderDetail'
+import ProductDetail from './pages/student/ProductDetail'
+import SpendingAnalytics from './pages/student/SpendingAnalytics'
 import Wallet  from './pages/student/Wallet'
 import Profile from './pages/student/Profile'
 
@@ -68,9 +70,11 @@ export default function App() {
       {/* Student */}
       <Route element={<ProtectedRoute roles={['student']}><StudentLayout /></ProtectedRoute>}>
         <Route path="/menu"         element={<Menu />} />
+        <Route path="/menu/:id"     element={<ProductDetail />} />
         <Route path="cart"         element={<Cart />} />
         <Route path="orders"       element={<Orders />} />
         <Route path="orders/:id"   element={<OrderDetail />} />
+        <Route path="spending-analytics" element={<SpendingAnalytics />} />
         <Route path="wallet"       element={<Wallet />} />
         <Route path="profile"      element={<Profile />} />
       </Route>

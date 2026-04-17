@@ -58,6 +58,9 @@ const { walletRouter, orderRouter }  = require("./routes/walletOrderRoutes");
 const { kitchenRouter, adminRouter, reviewRouter, notifRouter } = require("./routes/allRoutes");
 
 // ── Mount routes ──────────────────────────────────────────────
+app.use('/api/reviews', require('./routes/review'));
+app.use('/api/analytics', require('./routes/analytics'));
+
 app.use("/api/auth",          authRoutes);
 app.use("/api/categories",    categoryRouter);
 app.use("/api/menu",          menuRouter);
