@@ -1,7 +1,7 @@
 // src/pages/admin/Dashboard.jsx
 import { useState, useEffect } from 'react'
 import { adminAPI } from '../../api/axios'
-import { Users, ShoppingBag, TrendingUp, IndianRupee, Star, Clock, Download } from 'lucide-react'
+import { Users, ShoppingBag, TrendingUp, IndianRupee, Star, Clock, Download, Loader2 } from 'lucide-react'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 function StatCard({ icon: Icon, label, value, sub, color = 'brand' }) {
@@ -40,6 +40,8 @@ export default function Dashboard() {
   const [items, setItems]         = useState(null)
   const [period, setPeriod]       = useState('monthly')
   const [loading, setLoading]     = useState(true)
+  const [exportingCSV, setExportingCSV] = useState(null)
+  const [exportingPDF, setExportingPDF] = useState(null)
 
   useEffect(() => {
     Promise.all([adminAPI.overview(), adminAPI.itemAnalytics()])
@@ -53,6 +55,7 @@ export default function Dashboard() {
 
   const handleExport = async (type) => {
     try {
+      setExportingCSV(type)
       const res = type === 'orders' ? await adminAPI.exportOrders() : await adminAPI.exportRevenue()
       const url = URL.createObjectURL(new Blob([res.data]))
       const a = document.createElement('a')
@@ -60,7 +63,20 @@ export default function Dashboard() {
       a.download = `${type}-${Date.now()}.csv`
       a.click()
       URL.revokeObjectURL(url)
-    } catch { /* toast from axios interceptor */ }
+    } catch { /* toast from axios interceptor */ } finally { setExportingCSV(null) }
+  }
+
+  const handleExportPDF = async (type) => {
+    try {
+      setExportingPDF(type)
+      const res = type === 'orders' ? await adminAPI.exportOrdersPDF() : await adminAPI.exportRevenuePDF({ period })
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${type}-${Date.now()}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch { /* toast from axios interceptor */ } finally { setExportingPDF(null) }
   }
 
   if (loading) return (
@@ -77,14 +93,22 @@ export default function Dashboard() {
           <h1 className="font-display font-700 text-2xl text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-400 mt-0.5">Canteen overview and analytics</p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <button onClick={() => handleExport('revenue')}
-            className="flex-1 sm:flex-none min-h-[44px] px-4 btn-outline text-sm flex items-center justify-center gap-1.5">
-            <Download size={14} /> Revenue CSV
+        <div className="flex gap-2 w-full sm:w-auto flex-wrap justify-end">
+          <button onClick={() => handleExport('revenue')} disabled={exportingCSV === 'revenue'}
+            className="flex-1 sm:flex-none min-h-[44px] px-3 btn-outline text-xs sm:text-sm flex items-center justify-center gap-1.5 disabled:opacity-50">
+            {exportingCSV === 'revenue' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} Rev CSV
           </button>
-          <button onClick={() => handleExport('orders')}
-            className="flex-1 sm:flex-none min-h-[44px] px-4 btn-outline text-sm flex items-center justify-center gap-1.5">
-            <Download size={14} /> Orders CSV
+          <button onClick={() => handleExportPDF('revenue')} disabled={exportingPDF === 'revenue'}
+            className="flex-1 sm:flex-none min-h-[44px] px-3 btn-outline border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50">
+            {exportingPDF === 'revenue' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} Rev PDF
+          </button>
+          <button onClick={() => handleExport('orders')} disabled={exportingCSV === 'orders'}
+            className="flex-1 sm:flex-none min-h-[44px] px-3 btn-outline text-xs sm:text-sm flex items-center justify-center gap-1.5 disabled:opacity-50">
+            {exportingCSV === 'orders' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} Ord CSV
+          </button>
+          <button onClick={() => handleExportPDF('orders')} disabled={exportingPDF === 'orders'}
+            className="flex-1 sm:flex-none min-h-[44px] px-3 btn-outline border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50">
+            {exportingPDF === 'orders' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} Ord PDF
           </button>
         </div>
       </div>

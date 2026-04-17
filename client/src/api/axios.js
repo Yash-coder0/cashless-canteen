@@ -98,6 +98,8 @@ export const adminAPI = {
   allMenu:       ()  => api.get('/admin/menu'),
   exportOrders:  (p) => api.get('/admin/export/orders', { params: p, responseType: 'blob' }),
   exportRevenue: ()  => api.get('/admin/export/revenue', { responseType: 'blob' }),
+  exportOrdersPDF: (p) => api.get('/admin/export/orders-pdf', { params: p, responseType: 'blob' }),
+  exportRevenuePDF: (p) => api.get('/admin/export/revenue-pdf', { params: p, responseType: 'blob' }),
 }
 
 export const reviewAPI = {
