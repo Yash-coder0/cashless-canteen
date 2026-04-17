@@ -1,12 +1,13 @@
 // src/layouts/StudentLayout.jsx
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { ShoppingBag, ClipboardList, Wallet, User, UtensilsCrossed } from 'lucide-react'
+import { ShoppingBag, ClipboardList, Wallet, User, UtensilsCrossed, BarChart2 } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import Footer from '../components/Footer'
 
 const nav = [
   { to: '/menu',    icon: UtensilsCrossed, label: 'Menu' },
   { to: '/orders',  icon: ClipboardList,   label: 'Orders' },
+  { to: '/spending-analytics', icon: BarChart2, label: 'Spending' },
   { to: '/cart',    icon: ShoppingBag,     label: 'Cart' },
   { to: '/wallet',  icon: Wallet,          label: 'Wallet' },
   { to: '/profile', icon: User,            label: 'Profile' },

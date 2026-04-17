@@ -1,5 +1,6 @@
 // src/pages/student/Menu.jsx
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { menuAPI, categoryAPI } from '../../api/axios'
 import { useCart } from '../../context/CartContext'
 import toast from 'react-hot-toast'
@@ -20,7 +21,9 @@ function MenuCard({ item }) {
   const cartItem = cart?.items?.find(i => i.menuItem?._id === item._id || i.menuItem === item._id)
   const qty = cartItem?.quantity || 0
 
-  const handleAdd = async () => {
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setAdding(true)
     try {
       await addToCart(item._id, 1)
@@ -30,12 +33,14 @@ function MenuCard({ item }) {
     } finally { setAdding(false) }
   }
 
-  const handleQty = async (newQty) => {
+  const handleQty = async (e, newQty) => {
+    e.preventDefault();
+    e.stopPropagation();
     try { await updateItem(item._id, newQty) } catch { toast.error('Update failed.') }
   }
 
   return (
-    <div className={`card overflow-hidden transition-all duration-200 hover:shadow-card-hover
+    <Link to={`/menu/${item._id}`} className={`block cursor-pointer card overflow-hidden transition-all duration-200 hover:shadow-card-hover
                      ${item.isSoldOut ? 'opacity-60' : ''}`}>
       {/* Image */}
       <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
@@ -88,12 +93,12 @@ function MenuCard({ item }) {
             </button>
           ) : (
             <div className="flex items-center gap-1.5 bg-brand-50 rounded-xl p-1">
-              <button onClick={() => handleQty(qty - 1)}
+              <button onClick={(e) => handleQty(e, qty - 1)}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
                 <Minus size={14} className="text-brand-500" />
               </button>
               <span className="text-sm font-bold text-brand-600 min-w-[24px] text-center">{qty}</span>
-              <button onClick={() => handleQty(qty + 1)}
+              <button onClick={(e) => handleQty(e, qty + 1)}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all">
                 <Plus size={14} className="text-brand-500" />
               </button>
@@ -101,7 +106,7 @@ function MenuCard({ item }) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

@@ -47,6 +47,11 @@ const reviewSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    isApproved: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
@@ -64,6 +69,12 @@ reviewSchema.index({ orderId: 1 });                         // Reviews from a sp
 reviewSchema.index(
   { userId: 1, orderId: 1, menuItemId: 1 },
   { unique: true, name: "one_review_per_order_item" }
+);
+
+// ❗ Prevent duplicate reviews completely per user per menu item
+reviewSchema.index(
+  { menuItemId: 1, userId: 1 },
+  { unique: true, name: "one_review_per_student_item" }
 );
 
 // ─────────────────────────────────────────────
@@ -94,72 +105,3 @@ reviewSchema.post("save", async function () {
 module.exports = mongoose.model("Review", reviewSchema);
 
 
-// ============================================================
-// NOTIFICATION MODEL
-// Stored notifications for the in-app notification bell.
-// Real-time delivery via Socket.io (separate from this).
-// ============================================================
-
-const notificationSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    title: {
-      type: String,
-      required: true,
-      maxlength: 100,
-    },
-
-    message: {
-      type: String,
-      required: true,
-      maxlength: 300,
-    },
-
-    type: {
-      type: String,
-      enum: [
-        "order_update",   // Order status changed
-        "wallet_credit",  // Wallet topped up
-        "wallet_low",     // Balance below threshold (e.g., < ₹50)
-        "new_item",       // New menu item added
-        "promotion",      // Special offer from canteen
-        "system",         // Maintenance, announcements
-      ],
-      required: true,
-    },
-
-    // Contextual data for deep-linking (e.g., clicking notification opens the order)
-    data: {
-      orderId: { type: mongoose.Schema.Types.ObjectId, default: null },
-      menuItemId: { type: mongoose.Schema.Types.ObjectId, default: null },
-    },
-
-    isRead: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    // Only createdAt — notifications don't get updated
-    timestamps: { createdAt: true, updatedAt: false },
-  }
-);
-
-// ─────────────────────────────────────────────
-// INDEXES
-// ─────────────────────────────────────────────
-notificationSchema.index({ userId: 1, createdAt: -1 }); // User notification list
-notificationSchema.index({ userId: 1, isRead: 1 });      // Unread badge count
-
-// Auto-delete notifications older than 30 days (TTL index)
-notificationSchema.index(
-  { createdAt: 1 },
-  { expireAfterSeconds: 30 * 24 * 60 * 60 } // 30 days in seconds
-);
-
-module.exports = mongoose.model("Notification", notificationSchema);

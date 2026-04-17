@@ -143,6 +143,16 @@ const menuItemSchema = new mongoose.Schema(
       min: 0,
     },
 
+    avgRating: {
+      type: Number,
+      default: 0,
+    },
+
+    reviewCount: {
+      type: Number,
+      default: 0,
+    },
+
     // ── Analytics ─────────────────────────────────────
     totalOrders: {
       type: Number,
