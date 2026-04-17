@@ -72,7 +72,7 @@ export default function AdminLayout() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto lg:pt-0 pt-16 w-full">
+      <div className="flex-1 overflow-y-auto lg:pt-0 pt-16 w-full" data-lenis-prevent>
         <Outlet />
       </div>
     </div>

@@ -1,6 +1,7 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import useSmoothScroll from './utils/useSmoothScroll'
 
 // Auth
 import Login    from './pages/auth/Login'
@@ -55,6 +56,7 @@ const Spinner = () => (
 )
 
 export default function App() {
+  useSmoothScroll()
   return (
     <Routes>
       {/* Public */}
