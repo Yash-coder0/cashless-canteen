@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { adminAPI } from '../../api/axios'
 import { format } from 'date-fns'
-import { Download, Search, Filter } from 'lucide-react'
+import { Download, Search, Filter, Loader2 } from 'lucide-react'
 import ResponsiveTable from '../../components/ResponsiveTable'
 
 const STATUS_BADGE = {
@@ -19,6 +19,8 @@ export default function AdminOrders() {
   const [status, setStatus]   = useState('')
   const [dateFrom, setFrom]   = useState('')
   const [dateTo, setTo]       = useState('')
+  const [exportingCSV, setExportingCSV] = useState(false)
+  const [exportingPDF, setExportingPDF] = useState(false)
 
   const fetch = async (p = 1) => {
     setLoading(true)
@@ -34,11 +36,22 @@ export default function AdminOrders() {
 
   const handleExport = async () => {
     try {
+      setExportingCSV(true)
       const res = await adminAPI.exportOrders({ status: status || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined })
       const url = URL.createObjectURL(new Blob([res.data]))
       const a = document.createElement('a'); a.href = url; a.download = `orders-${Date.now()}.csv`; a.click()
       URL.revokeObjectURL(url)
-    } catch {}
+    } catch {} finally { setExportingCSV(false) }
+  }
+
+  const handleExportPDF = async () => {
+    try {
+      setExportingPDF(true)
+      const res = await adminAPI.exportOrdersPDF({ status: status || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined })
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+      const a = document.createElement('a'); a.href = url; a.download = `orders-${Date.now()}.pdf`; a.click()
+      URL.revokeObjectURL(url)
+    } catch {} finally { setExportingPDF(false) }
   }
 
   const columns = [
@@ -90,9 +103,14 @@ export default function AdminOrders() {
           <h1 className="font-display font-700 text-2xl text-gray-900">Orders</h1>
           <p className="text-sm text-gray-400">{total} total orders</p>
         </div>
-        <button onClick={handleExport} className="btn-outline text-sm flex items-center gap-1.5 h-11 px-4">
-          <Download size={14} /> <span className="hidden sm:inline">Export CSV</span>
-        </button>
+        <div className="flex gap-2">
+          <button onClick={handleExport} disabled={exportingCSV} className="btn-outline text-sm flex items-center gap-1.5 h-11 px-4 disabled:opacity-50">
+            {exportingCSV ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} <span className="hidden sm:inline">Export CSV</span>
+          </button>
+          <button onClick={handleExportPDF} disabled={exportingPDF} className="btn-outline border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-sm flex items-center gap-1.5 h-11 px-4 disabled:opacity-50 transition-colors">
+            {exportingPDF ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} <span className="hidden sm:inline">Export PDF</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
