@@ -82,7 +82,12 @@ export default function Wallet() {
             await fetchAll()
           } catch { toast.error('Verification failed. Contact support.') }
         },
-        modal: { ondismiss: () => setTopping(false) },
+        modal: { 
+          ondismiss: () => {
+            setTopping(false);
+            toast.error("Payment cancelled. Your wallet was not charged.");
+          }
+        },
       }
 
       const rzp = new window.Razorpay(options)
@@ -179,11 +184,11 @@ export default function Wallet() {
       {/* Transactions */}
       <div className="card p-5">
         <h3 className="font-semibold text-gray-900 mb-4">Recent Transactions</h3>
-        {transactions.length === 0 ? (
+        {transactions.filter(t => t.status === 'completed').length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-4">No transactions yet.</p>
         ) : (
           <div className="space-y-3">
-            {transactions.map(tx => (
+            {transactions.filter(t => t.status === 'completed').map(tx => (
               <div key={tx._id} className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center
                                  ${tx.type === 'credit' ? 'bg-emerald-50' : tx.type === 'refund' ? 'bg-blue-50' : 'bg-red-50'}`}>

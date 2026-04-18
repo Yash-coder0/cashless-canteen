@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Users, ChefHat, Shield, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, Users, ChefHat, Shield, ArrowLeft, Home } from 'lucide-react'
+import AuthLayout from '../../components/layouts/AuthLayout'
 
 export default function Login() {
   const { login } = useAuth()
@@ -31,13 +32,9 @@ export default function Login() {
 
   if (!roleFromUrl) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-orange-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl animate-slide-up">
-          <button onClick={() => navigate('/')} className="w-fit text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5 text-sm font-semibold mb-8">
-            <ArrowLeft size={16} /> Back to Home
-          </button>
+      <AuthLayout>
+        <div className="w-full max-w-2xl animate-slide-up mx-4 md:mx-0">
           <div className="text-center mb-10">
-            <img src="/rit-logo.png" alt="RIT" className="h-24 w-auto object-contain mx-auto mb-6 drop-shadow-md rounded-2xl" onError={(e) => { e.target.style.display='none' }} />
             <h1 className="font-display font-800 text-4xl text-gray-900 mb-2">Welcome to RIT Canteen</h1>
             <p className="text-gray-500">Please select your login role to continue</p>
           </div>
@@ -66,16 +63,14 @@ export default function Login() {
             </button>
           </div>
         </div>
-      </div>
+      </AuthLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-orange-50 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md animate-slide-up">
-        {/* Logo */}
+    <AuthLayout>
+      <div className="w-full max-w-md animate-slide-up mx-4 md:mx-0">
         <div className="text-center mb-8">
-          <img src="/rit-logo.png" alt="RIT Logo" className="h-20 w-auto object-contain mx-auto mb-4 drop-shadow-md rounded-2xl" onError={(e) => { e.target.style.display='none' }} />
           <h1 className="font-display font-700 text-3xl text-gray-900">
             {roleFromUrl === 'admin' ? 'Admin Login' : roleFromUrl === 'kitchen' ? 'Kitchen Login' : 'Student Login'}
           </h1>
@@ -83,9 +78,22 @@ export default function Login() {
         </div>
 
         <div className="card p-8 relative">
-          <button onClick={() => navigate('/login')} className="absolute top-4 left-4 text-gray-400 hover:text-gray-700 transition flex items-center gap-1 text-xs font-semibold">
-            <ArrowLeft size={14} /> Back
-          </button>
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors"
+            >
+              <ArrowLeft size={16} />
+              Back
+            </button>
+            <Link
+              to="/"
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors"
+            >
+              <Home size={16} />
+              Home
+            </Link>
+          </div>
           
           <h2 className="font-display font-600 text-xl text-gray-900 mb-6 text-center mt-4 border-b border-gray-100 pb-4">Sign in</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -117,6 +125,6 @@ export default function Login() {
           )}
         </div>
       </div>
-    </div>
+    </AuthLayout>
   )
 }

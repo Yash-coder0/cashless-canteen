@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, ArrowLeft, Mail } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Mail, Home } from 'lucide-react'
+import AuthLayout from '../../components/layouts/AuthLayout'
 
 export default function Register() {
   const { register } = useAuth()
@@ -29,14 +30,9 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-orange-50 flex items-center justify-center p-4 py-10">
-      <div className="w-full max-w-md animate-slide-up">
-        <button onClick={() => navigate('/login')} className="w-fit text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5 text-sm font-semibold mb-6">
-          <ArrowLeft size={16} /> Back to Login
-        </button>
-        
+    <AuthLayout>
+      <div className="w-full max-w-md animate-slide-up mx-4 md:mx-0">
         <div className="text-center mb-8">
-          <img src="/rit-logo.png" alt="RIT Logo" className="h-20 w-auto object-contain mx-auto mb-4 drop-shadow-md rounded-2xl" onError={(e) => { e.target.style.display='none' }} />
           <h1 className="font-display font-700 text-3xl text-gray-900">RIT Canteen</h1>
           <p className="text-gray-500 mt-1 text-sm">Join the cashless canteen experience.</p>
         </div>
@@ -57,6 +53,22 @@ export default function Register() {
           </div>
         ) : (
           <div className="card p-8">
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors"
+              >
+                <ArrowLeft size={16} />
+                Back
+              </button>
+              <Link
+                to="/"
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors"
+              >
+                <Home size={16} />
+                Home
+              </Link>
+            </div>
             <h2 className="font-display font-600 text-xl text-gray-900 mb-6">Create account</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -103,6 +115,6 @@ export default function Register() {
           </div>
         )}
       </div>
-    </div>
+    </AuthLayout>
   )
 }

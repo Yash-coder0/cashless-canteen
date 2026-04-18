@@ -217,9 +217,6 @@ const verifyTopUp = async (req, res, next) => {
       throw new AppError("Missing payment verification fields.", 400);
     }
 
-    // ── Verify signature (throws if invalid) ──
-    verifyPaymentSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
-
     // ── Find our pending transaction ──────────
     const transaction = await WalletTxModel.findOne({
       _id: transactionId,
@@ -233,6 +230,21 @@ const verifyTopUp = async (req, res, next) => {
         "Transaction not found or already processed. Please contact support if money was deducted.",
         404
       );
+    }
+
+    // ── Verify signature (throws if invalid) ──
+    try {
+      verifyPaymentSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
+    } catch (signatureError) {
+      await WalletTxModel.findByIdAndUpdate(
+        transactionId,
+        {
+          status: "failed",
+          razorpayOrderId,
+          razorpayPaymentId,
+        }
+      );
+      throw new AppError("Invalid payment signature. Verification failed.", 400);
     }
 
     // ── Credit wallet atomically ──────────────
