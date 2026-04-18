@@ -25,8 +25,8 @@ export const AuthProvider = ({ children }) => {
     }
   }, [])
 
-  const login = async (email, password) => {
-    const res = await authAPI.login({ email, password })
+  const login = async (email, password, role) => {
+    const res = await authAPI.login({ email, password, role })
     const { token, user } = res.data
     localStorage.setItem('canteen_token', token)
     localStorage.setItem('canteen_user', JSON.stringify(user))

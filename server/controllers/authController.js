@@ -117,7 +117,7 @@ const register = async (req, res, next) => {
 // ─────────────────────────────────────────────
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role: requestedRole } = req.body;
 
     // ── Validate input ────────────────────────
     if (!email || !password) {
@@ -135,17 +135,20 @@ const login = async (req, res, next) => {
       throw new AppError("Incorrect email or password.", 401);
     }
 
-    // ── Check account email verification ─────
-    // if (user.isEmailVerified === false) {
-    //   throw new AppError("Please verify your email before logging in. Check your inbox.", 403);
-    // }
-
     // ── Check account status ──────────────────
     if (!user.isActive) {
       throw new AppError(
         "Your account has been deactivated. Please contact the canteen admin.",
         403
       );
+    }
+
+    // Role enforcement — reject if role doesn't match login panel
+    if (requestedRole && user.role !== requestedRole) {
+      return res.status(403).json({
+        success: false,
+        message: `This account is not registered as a ${requestedRole}. Please use the correct login panel.`
+      });
     }
 
     sendTokenResponse(user, 200, res);
@@ -376,6 +379,120 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
+// ─────────────────────────────────────────────
+// @route   POST /api/auth/forgot-password
+// @access  Public
+// ─────────────────────────────────────────────
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new AppError("Please provide an email address.", 400);
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      // Security best practice: do not reveal if email exists
+      return res.status(200).json({
+        success: true,
+        message: "If this email is registered, a reset link has been sent.",
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    user.passwordResetToken = hashedToken;
+    user.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+    await user.save();
+
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${token}`;
+    const { sendEmail } = require("../utils/email"); // Note assuming standard export if not using emailSender
+    
+    // Check if sendEmail exported from email.js exists. Some email utils export differently.
+    // We will just directly use our logic:
+    const htmlBody = `
+      <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 32px; border: 1px solid #f3f4f6;">
+        <div style="text-align:center; margin-bottom: 24px;">
+          <h2 style="color: #111827; font-size: 22px; font-weight: 700; margin: 0;">RIT Canteen</h2>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 4px;">Password Reset Request</p>
+        </div>
+        <p style="color: #374151; font-size: 15px; line-height: 1.6;">
+          You requested a password reset for your RIT Canteen account.
+          Click the button below to reset your password. 
+          This link expires in <strong>15 minutes</strong>.
+        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${resetUrl}" style="background: #f97316; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">
+            Reset My Password
+          </a>
+        </div>
+        <p style="color: #9ca3af; font-size: 13px; text-align: center;">
+          If you didn't request this, ignore this email. Your password will not change.
+        </p>
+        <hr style="border: none; border-top: 1px solid #f3f4f6; margin: 24px 0;" />
+        <p style="color: #d1d5db; font-size: 12px; text-align: center;">
+          © 2025 RIT Canteen · Rajarambapu Institute of Technology
+        </p>
+      </div>`;
+
+    try {
+      const { sendEmail } = require("../utils/emailSender");
+      await sendEmail({ to: user.email, subject: "RIT Canteen — Password Reset Request", html: htmlBody });
+      
+      res.status(200).json({
+        success: true,
+        message: "If this email is registered, a reset link has been sent.",
+      });
+    } catch (err) {
+      console.error(err);
+      user.passwordResetToken = null;
+      user.passwordResetExpires = null;
+      await user.save();
+      throw new AppError("There was an error sending the email. Try again later.", 500);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+// ─────────────────────────────────────────────
+const resetPassword = async (req, res, next) => {
+  try {
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const { password } = req.body;
+
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      throw new AppError("Reset link is invalid or has expired.", 400);
+    }
+
+    if (!password || password.length < 8) {
+      throw new AppError("Password must be at least 8 characters.", 400);
+    }
+
+    // We do NOT hash it here because User model pre-save hook handles it!
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful. You can now log in.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -384,4 +501,6 @@ module.exports = {
   createStaff,
   changePassword,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 };

@@ -15,18 +15,24 @@ export default function Login() {
   const [form, setForm]       = useState({ email: '', password: '' })
   const [showPw, setShowPw]   = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
     try {
-      const user = await login(form.email, form.password)
+      const user = await login(form.email, form.password, roleFromUrl)
       toast.success(`Welcome back, ${user.name.split(' ')[0]}!`)
       if (user.role === 'admin')   navigate('/admin')
       else if (user.role === 'kitchen') navigate('/kitchen')
       else navigate('/menu')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed.')
+      if (err.response?.status === 403 || err.response?.status === 401) {
+        setError(err.response?.data?.message || 'Login failed.')
+      } else {
+        toast.error(err.response?.data?.message || 'Login failed.')
+      }
     } finally { setLoading(false) }
   }
 
@@ -96,6 +102,11 @@ export default function Login() {
           </div>
           
           <h2 className="font-display font-600 text-xl text-gray-900 mb-6 text-center mt-4 border-b border-gray-100 pb-4">Sign in</h2>
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-600 text-sm text-center mb-4">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
@@ -112,6 +123,14 @@ export default function Login() {
                   {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+            </div>
+            <div className="text-right mb-4 -mt-2">
+              <Link 
+                to="/forgot-password"
+                className="text-sm text-orange-500 hover:text-orange-600 font-medium transition-colors"
+              >
+                Forgot password?
+              </Link>
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full mt-2">
               {loading ? 'Signing in…' : 'Sign in'}

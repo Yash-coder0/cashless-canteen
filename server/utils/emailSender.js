@@ -60,4 +60,48 @@ const sendVerificationEmail = async (toEmail, toName, token) => {
   }
 };
 
-module.exports = { sendVerificationEmail };
+const sendEmail = async ({ to, subject, html }) => {
+  const payload = {
+    sender: {
+      name: senderName,
+      email: senderEmail
+    },
+    to: [
+      {
+        email: to,
+        name: to.split('@')[0]
+      }
+    ],
+    subject: subject,
+    htmlContent: html
+  };
+
+  if (!brevoApiKey) {
+    throw new Error("BREVO_API_KEY environment variable is not configured.");
+  }
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": brevoApiKey,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Brevo Email Error:", errorData);
+      throw new Error("Failed to send email via Brevo.");
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Email Sending Failed:", error);
+    throw error;
+  }
+};
+
+module.exports = { sendVerificationEmail, sendEmail };

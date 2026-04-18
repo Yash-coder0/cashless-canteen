@@ -8,6 +8,8 @@ import Login    from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Home     from './pages/public/Home'
 import VerifyEmail from './pages/user/VerifyEmail'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 
 // Layouts
 import StudentLayout from './layouts/StudentLayout'
@@ -66,6 +68,8 @@ export default function App() {
       <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/verify-email" element={<PublicRoute><VerifyEmail /></PublicRoute>} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+      <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
       {/* Student */}
       <Route element={<ProtectedRoute roles={['student']}><StudentLayout /></ProtectedRoute>}>

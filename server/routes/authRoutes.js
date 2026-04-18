@@ -15,6 +15,8 @@ const {
   createStaff,
   changePassword,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/authController");
 
 const { protect, authorize } = require("../middleware/auth");
@@ -23,6 +25,8 @@ const { protect, authorize } = require("../middleware/auth");
 router.post("/register", register);       // Student self-registration
 router.post("/login", login);             // All roles login here
 router.get("/verify-email", verifyEmail); // Email verification using ?token=
+router.post("/forgot-password", forgotPassword); // Request password reset
+router.post("/reset-password/:token", resetPassword); // Reset password using token
 
 // ── Protected routes (valid JWT required) ────────────────────
 router.get("/me", protect, getMe);                        // Get own profile

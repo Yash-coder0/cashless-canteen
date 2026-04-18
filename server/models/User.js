@@ -94,6 +94,7 @@ const userSchema = new mongoose.Schema(
     emailVerificationExpiry: { type: Date, select: false },
     passwordResetToken: { type: String, select: false },
     passwordResetExpiry: { type: Date, select: false },
+    passwordResetExpires: { type: Date, default: null },
 
     // Track last login for analytics
     lastLoginAt: {
