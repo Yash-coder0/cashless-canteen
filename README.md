@@ -1,30 +1,50 @@
 # 🍽️ RIT Canteen — Cashless Canteen Management System
 
-> A full-stack, real-time cashless canteen system built for Rajarambapu Institute of Technology.  
-> Students order food, pay via digital wallet, and track orders live. Kitchen staff manage orders in real-time. Admin controls everything.
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-brightgreen" alt="status" />
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="license" />
+  <img src="https://img.shields.io/badge/stack-MERN-informational" alt="stack" />
+  <img src="https://img.shields.io/badge/realtime-Socket.io-black" alt="socketio" />
+</p>
+
+<p align="center">
+  A full-stack, real-time cashless canteen system built for <b>Rajarambapu Institute of Technology</b>.<br/>
+  Students order food and pay via digital wallet, kitchen staff manage orders live, and admins control everything from a single dashboard.
+</p>
+
+<p align="center">
+  <img src="https://via.placeholder.com/900x420?text=RIT+Canteen+Screenshot" alt="RIT Canteen preview" width="80%" />
+</p>
 
 ---
 
-## 🚀 Live Demo
+## 📖 Table of Contents
 
-| Panel | URL | Credentials |
-|---|---|---|
-| Student | `http://localhost:5173` | Register with college email |
-| Kitchen | `http://localhost:5173/kitchen` | Created by Admin |
-| Admin | `http://localhost:5173/admin` | Created manually (see setup) |
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Live Demo / Local URLs](#-live-demo)
+- [Setup & Installation](#-setup--installation)
+- [Test Credentials](#-test-credentials-razorpay-test-mode)
+- [API Reference](#-api-reference)
+- [Deploying to GitHub](#-push-to-github--step-by-step)
+- [Team](#-team)
+- [License](#-license)
 
 ---
 
 ## ✨ Features
 
-- 🔐 JWT Authentication with role-based access (Student / Kitchen / Admin)
-- 📱 Mobile-first Student Panel — browse menu, cart, orders, wallet
-- 💳 Razorpay wallet top-up with live payment verification
-- 📦 Real-time order tracking with Socket.io (Placed → Accepted → Cooking → Ready)
-- 📲 QR Code generated per order for counter pickup
-- 👨‍🍳 Kitchen Kanban board with live new-order sound alerts
-- 📊 Admin analytics dashboard — revenue charts, top items, CSV export
-- 🌐 Public landing page with bestsellers, reviews, footer
+| Category | Highlights |
+|---|---|
+| 🔐 Auth | JWT authentication with role-based access (Student / Kitchen / Admin) |
+| 📱 Student Panel | Mobile-first UI — browse menu, cart, orders, wallet |
+| 💳 Payments | Razorpay wallet top-up with live payment verification |
+| 📦 Order Tracking | Real-time status updates via Socket.io (Placed → Accepted → Cooking → Ready) |
+| 📲 Pickup | Auto-generated QR code per order for counter pickup |
+| 👨‍🍳 Kitchen View | Live Kanban board with new-order sound alerts |
+| 📊 Admin Dashboard | Revenue charts, top-selling items, CSV export |
+| 🌐 Public Page | Landing page with bestsellers and reviews |
 
 ---
 
@@ -73,6 +93,16 @@ cashless-canteen/
 
 ---
 
+## 🚀 Live Demo
+
+| Panel | URL | Credentials |
+|---|---|---|
+| Student | `http://localhost:5173` | Register with college email |
+| Kitchen | `http://localhost:5173/kitchen` | Created by Admin |
+| Admin | `http://localhost:5173/admin` | Created manually (see [setup](#3-create-first-admin-account)) |
+
+---
+
 ## ⚙️ Setup & Installation
 
 ### Prerequisites
@@ -82,8 +112,6 @@ cashless-canteen/
 - Cloudinary account (free tier)
 - Gmail account (for email verification)
 
----
-
 ### 1. Clone the repository
 
 ```bash
@@ -91,18 +119,11 @@ git clone https://github.com/YOUR_USERNAME/cashless-canteen.git
 cd cashless-canteen
 ```
 
----
-
 ### 2. Backend Setup
 
 ```bash
 cd server
 npm install
-```
-
-Create your `.env` file:
-
-```bash
 cp .env.example .env
 ```
 
@@ -140,13 +161,14 @@ EMAIL_PASS=xxxx xxxx xxxx xxxx
 EMAIL_FROM=RIT Canteen <your.gmail@gmail.com>
 ```
 
-Start backend:
+Start the backend:
 
 ```bash
 npm run dev
 ```
 
-You should see:
+Expected output:
+
 ```
 ✅ Environment variables validated
 ✅ MongoDB connected: cluster0.xxxxx.mongodb.net
@@ -159,15 +181,13 @@ Seed sample menu data:
 npm run seed
 ```
 
----
-
 ### 3. Create First Admin Account
 
-Since admin accounts can't self-register, create one directly in MongoDB Atlas:
+Admin accounts can't self-register — create one directly in MongoDB Atlas:
 
 1. Go to [MongoDB Atlas](https://cloud.mongodb.com)
-2. Open your cluster → Browse Collections → `cashless-canteen` → `users`
-3. Insert document:
+2. Open your cluster → **Browse Collections** → `cashless-canteen` → `users`
+3. Insert this document:
 
 ```json
 {
@@ -182,15 +202,13 @@ Since admin accounts can't self-register, create one directly in MongoDB Atlas:
 }
 ```
 
-**To get a hashed password**, run this in your server folder:
+Get a hashed password by running this in your `server` folder:
 
 ```bash
 node -e "const b=require('bcryptjs'); b.hash('Admin@123', 12).then(h => console.log(h))"
 ```
 
 Copy the output hash into the `password` field above.
-
----
 
 ### 4. Frontend Setup
 
@@ -205,18 +223,13 @@ Create `client/.env`:
 VITE_API_URL=http://localhost:5000/api
 ```
 
-Add your RIT logo:
-```
-client/public/rit-logo.png   ← paste your logo here
-```
-
-Start frontend:
+Add your RIT logo at `client/public/rit-logo.png`, then start the frontend:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open [http://localhost:5173](http://localhost:5173).
 
 ---
 
@@ -233,19 +246,19 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ## 📡 API Reference
 
-Full API docs are in `server/API_REFERENCE.md`
+Full API docs are in [`server/API_REFERENCE.md`](./server/API_REFERENCE.md).
 
 Quick reference:
 
 ```
-POST   /api/auth/register          → Student registration
-POST   /api/auth/login             → All roles login
-GET    /api/auth/me                → Get current user
-GET    /api/menu                   → Browse menu (public)
-POST   /api/cart/add               → Add to cart (student)
-POST   /api/orders                 → Place order (student)
-POST   /api/wallet/topup/initiate  → Start Razorpay top-up
-PATCH  /api/orders/:id/status      → Update order status (kitchen)
+POST   /api/auth/register            → Student registration
+POST   /api/auth/login               → All roles login
+GET    /api/auth/me                  → Get current user
+GET    /api/menu                     → Browse menu (public)
+POST   /api/cart/add                 → Add to cart (student)
+POST   /api/orders                   → Place order (student)
+POST   /api/wallet/topup/initiate    → Start Razorpay top-up
+PATCH  /api/orders/:id/status        → Update order status (kitchen)
 GET    /api/admin/analytics/overview → Admin dashboard
 ```
 
@@ -253,21 +266,22 @@ GET    /api/admin/analytics/overview → Admin dashboard
 
 ## 🐙 Push to GitHub — Step by Step
 
-### Step 1 — Create repository on GitHub
+<details>
+<summary><b>Step 1 — Create repository on GitHub</b></summary>
 
 1. Go to [github.com](https://github.com) → Sign in
-2. Click the **+** button → **New repository**
-3. Repository name: `cashless-canteen` (or any name)
-4. Set to **Private** (recommended — contains .env.example with structure)
-5. **Do NOT** tick "Add README" or "Add .gitignore" — we'll add our own
-6. Click **Create repository**
-7. Copy the repository URL shown (e.g. `https://github.com/yourusername/cashless-canteen.git`)
+2. Click **+** → **New repository**
+3. Name it `cashless-canteen` (or anything you like)
+4. Set it to **Private** (recommended — the repo includes `.env.example` structure)
+5. Do **not** tick "Add README" or "Add .gitignore" — we'll add our own
+6. Click **Create repository** and copy the repo URL shown
 
----
+</details>
 
-### Step 2 — Create .gitignore files
+<details>
+<summary><b>Step 2 — Create .gitignore</b></summary>
 
-In your **project root** (`cashless-canteen/`), create a file called `.gitignore`:
+In your project root (`cashless-canteen/`), create a `.gitignore` file:
 
 ```
 # Dependencies
@@ -295,63 +309,50 @@ Thumbs.db
 client/.vite/
 ```
 
----
+</details>
 
-### Step 3 — Initialize Git and push
+<details>
+<summary><b>Step 3 — Initialize Git and push</b></summary>
 
-Open terminal in your **project root folder** (`cashless-canteen/`) and run these commands **one by one**:
+Run from your project root, one command at a time:
 
 ```bash
-# Initialize git repo
 git init
-
-# Add all files (gitignore will exclude .env automatically)
 git add .
-
-# Check what's being added — make sure .env is NOT listed
-git status
-
-# Create first commit
+git status                 # confirm .env is NOT listed
 git commit -m "Initial commit — RIT Canteen Cashless System"
-
-# Set main branch
 git branch -M main
-
-# Connect to your GitHub repo (paste YOUR repo URL here)
 git remote add origin https://github.com/YOUR_USERNAME/cashless-canteen.git
-
-# Push to GitHub
 git push -u origin main
 ```
 
-You'll be asked for your GitHub username and password/token.  
-**Use a Personal Access Token (not your password):**
+When prompted for a password, use a **Personal Access Token**:
 1. GitHub → Settings → Developer Settings → Personal Access Tokens → Tokens (classic)
-2. Click "Generate new token" → Select `repo` scope → Generate
-3. Copy and paste that token as the password
+2. Generate new token → select `repo` scope → Generate
+3. Paste the token as your password
 
----
+</details>
 
-### Step 4 — Verify on GitHub
+<details>
+<summary><b>Step 4 — Verify on GitHub</b></summary>
 
 1. Refresh your GitHub repository page
-2. You should see all your files
-3. Confirm `server/.env` is **NOT** visible (if it is, see note below)
+2. Confirm all files are present
+3. Confirm `server/.env` is **NOT** visible
 
-> ⚠️ **If .env was accidentally pushed:**
+> ⚠️ If `.env` was accidentally pushed:
 > ```bash
 > git rm --cached server/.env
 > git rm --cached client/.env
 > git commit -m "Remove .env files from tracking"
 > git push
 > ```
-> Then immediately rotate all your secrets (MongoDB password, JWT secret, Razorpay keys).
+> Then immediately rotate all secrets (MongoDB password, JWT secret, Razorpay keys).
 
----
+</details>
 
-### Step 5 — Future updates
-
-Every time you make changes:
+<details>
+<summary><b>Step 5 — Future updates</b></summary>
 
 ```bash
 git add .
@@ -359,14 +360,14 @@ git commit -m "describe what you changed"
 git push
 ```
 
+</details>
+
 ---
 
 ## 👥 Team
 
-Built by students at Rajarambapu Institute of Technology, Islampur.
-
----
+Built by students at **Rajarambapu Institute of Technology**, Islampur.
 
 ## 📄 License
 
-MIT — Free to use for educational purposes.
+MIT — free to use for educational purposes.
